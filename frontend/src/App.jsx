@@ -1,122 +1,122 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState } from 'react';
+import { newsAPI } from './services/api';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [text, setText] = useState('');
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleAnalyze = async () => {
+    if (!text.trim()) {
+      alert("Enter some news text");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setResult(null); // reset previous result
+
+      const res = await newsAPI.analyze({ text }); // ✅ JSON request
+
+      setResult(res.data);
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
+    <div
+      style={{
+        minHeight: '100vh',
+        background: '#f5f7fa',
+        padding: '40px',
+        fontFamily: 'Arial',
+      }}
+    >
+      <div
+        style={{
+          maxWidth: '800px',
+          margin: 'auto',
+          background: '#fff',
+          padding: '30px',
+          borderRadius: '12px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        }}
+      >
+        <h1 style={{ textAlign: 'center' }}>🧠 GeoTruth AI</h1>
+        <p style={{ textAlign: 'center', color: '#555' }}>
+          Detect fake / real news instantly
+        </p>
+
+        <textarea
+          rows="5"
+          style={{
+            width: '100%',
+            padding: '12px',
+            borderRadius: '8px',
+            border: '1px solid #ccc',
+            marginTop: '20px',
+          }}
+          placeholder="Paste news text here..."
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+
         <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
+          onClick={handleAnalyze}
+          disabled={loading}
+          style={{
+            width: '100%',
+            marginTop: '20px',
+            padding: '12px',
+            borderRadius: '8px',
+            border: 'none',
+            background: loading ? '#6c757d' : '#007bff',
+            color: '#fff',
+            fontSize: '16px',
+            cursor: loading ? 'not-allowed' : 'pointer',
+          }}
         >
-          Count is {count}
+          {loading ? "Analyzing..." : "Analyze News"}
         </button>
-      </section>
 
-      <div className="ticks"></div>
+        {/* RESULT */}
+        {result && (
+          <div
+            style={{
+              marginTop: '30px',
+              padding: '20px',
+              borderRadius: '10px',
+              background:
+                result.label === "REAL"
+                  ? '#e6f4ea'
+                  : result.label === "FAKE"
+                  ? '#fdecea'
+                  : '#fff4e5',
+            }}
+          >
+            <h2>Result</h2>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+            <p><strong>Label:</strong> {result.label}</p>
+            <p><strong>Trust Score:</strong> {result.trust_score}%</p>
+            <p>
+              <strong>Confidence:</strong>{" "}
+              {(result.confidence * 100).toFixed(2)}%
+            </p>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+            <div style={{ marginTop: '10px', fontWeight: 'bold' }}>
+              {result.label === "REAL" && "✅ Reliable News"}
+              {result.label === "FAKE" && "❌ Fake News"}
+              {result.label === "MISLEADING" && "⚠️ Misleading Content"}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
-export default App
+export default App;
