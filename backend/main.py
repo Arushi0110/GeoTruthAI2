@@ -45,13 +45,13 @@ try:
     )
     from backend.routes import image_routes
 except ImportError:
-    from models import (
+    from backend.models import (
         HealthResponse,
         TextAnalysisRequest,
         AnalysisResponse,
         ImageVerificationResponse,
     )
-    from services import (
+    from backend.services import (
         analyze_text,
         is_model_loaded,
         is_api_key_configured,
@@ -59,7 +59,7 @@ except ImportError:
         analyze_image_hash,
         analyze_image_cnn,
     )
-    from routes import image_routes
+    from backend.routes import image_routes
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -75,7 +75,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 PORT = int(os.environ.get("PORT", 5001))
 HOST = os.environ.get("HOST", "0.0.0.0")
-DEBUG = os.environ.get("DEBUG", "false").lower() == "true"
+DEBUG = os.environ.get("DEBUG", "true").lower() == "true"
 CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "*").split(",")
 
 # ---------------------------------------------------------------------------
