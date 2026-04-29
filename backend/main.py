@@ -16,6 +16,10 @@ import uuid
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 from typing import Optional
+from backend.services.news_api_service import verify_with_newsapi
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Ensure project root is in path for absolute imports
 _PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -160,7 +164,7 @@ app = FastAPI(
 # CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=CORS_ORIGINS,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -261,17 +265,22 @@ async def analyze_text_endpoint(request: TextAnalysisRequest):
         AnalysisResponse with label, scores, and metadata.
     """
     try:
+        news_service = NewsApiService()
+        news_result = news_service.validateNews(request.text)
+        news_api_score = news_result.get("newsApiScore")
         ai_result = analyze_text(request.text)
         label = ai_result["label"]
         confidence = ai_result["confidence"]
 
         # Normalize score: FAKE confidence → lower score, REAL → higher
         ai_score = confidence if label == "REAL" else 1.0 - confidence
-
+        if news_api_score is not None:
+           ai_score = (ai_score * 0.6) + (news_api_score * 0.4)
+        ai_score = max(0.05, min(ai_score, 0.95))
         return AnalysisResponse(
             label=label,
             ai_score=round(ai_score, 4),
-            ai_label=ai_result["raw_label"],
+            ai_label=ai_result.get("raw_label", label),
             ai_confidence=round(confidence, 4),
             message="Analysis completed successfully",
         )
@@ -379,17 +388,17 @@ async def analyze_news(
     )
 
     return NewsAnalysisResponse(
-        label=final_label,
-        trust_score=trust_score,
-        confidence=round(combined_score, 4),
-        ai_score=round(text_ai_score, 4),
-        ai_label=ai_result.get("raw_label", "UNKNOWN"),
-        ai_confidence=round(text_confidence, 4),
-        image_score=round(image_score, 4) if image_score is not None else None,
-        image_decision=image_decision,
-        location=parsed_location,
-        message="Analysis completed successfully",
-    )
+    label=final_label,
+    trust_score=trust_score,
+    confidence=round(combined_score, 4),
+    ai_score=round(text_ai_score, 4),
+    ai_label=ai_result.get("raw_label", "UNKNOWN"),
+    ai_confidence=round(text_confidence, 4),
+    image_score=round(image_score, 4) if image_score is not None else None,
+    image_decision=image_decision,
+    location=parsed_location,
+    message="Analysis completed successfully",
+)
 
 
 # ---------------------------------------------------------------------------

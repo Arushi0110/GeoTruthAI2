@@ -13,16 +13,6 @@ logs
 # OS files
 .DS_Store
 
-# ignore env example
-whatsapp-service/.env.example# env files
-.env
-.env.local
-.env.production
-whatsapp-service/.env.example
-
-# dependencies
-node_modules/
-
 # python cache
 __pycache__/
 *.pyc
@@ -32,12 +22,5 @@ __pycache__/
 dist/
 build/
 
-# logs
-logs
-*.log
-
-# OS files
-.DS_Store
-__pycache__/
-*.pyc
-.env
+# env example files
+whatsapp-service/.env.example

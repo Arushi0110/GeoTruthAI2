@@ -54,16 +54,34 @@ const Signup = () => {
 
     try {
       const response = await authAPI.signup(formData);
+
+      if (!response?.data?.token) {
+        throw new Error('Invalid response from server');
+      }
+
       const { token, user } = response.data;
+      
+
       setAuth(token, user);
       showToast('Account created successfully! Welcome aboard.', 'success');
       setTimeout(() => navigate('/home'), 600);
     } catch (err) {
-      const message = err.response?.data?.message || 'Signup failed. Please try again.';
-      showToast(message, 'error');
-    } finally {
-      setLoading(false);
-    }
+  const message =
+    err.response?.data?.detail ||
+    err.response?.data?.message ||
+    err.message ||
+    'Signup failed. Please try again.';
+
+  let finalMessage = message;
+
+  if (message.includes('already registered')) {
+    finalMessage = 'This email is already in use. Try logging in.';
+  }
+
+  showToast(finalMessage, 'error');
+} finally {
+  setLoading(false);
+}
   };
 
   return (

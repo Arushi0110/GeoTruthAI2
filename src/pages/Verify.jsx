@@ -102,7 +102,7 @@ const Verify = () => {
 
       // Step 3: Send POST request via Axios
       const response = await axios.post(
-        'http://localhost:5000/api/news/analyze',
+        '/api/news/analyze',
         formData,
         {
           headers: {
@@ -115,7 +115,8 @@ const Verify = () => {
       setResult(response.data);
     } catch (err) {
       setError(
-        err.response?.data?.message ||
+        err.response?.data?.detail ||
+          err.response?.data?.message ||
           err.message ||
           'An error occurred while analyzing the news.'
       );
@@ -194,7 +195,9 @@ const Verify = () => {
                       alt="Preview"
                       className="max-h-32 rounded-lg mb-2 object-contain"
                     />
-                    <span className="text-sm text-blue-600 font-medium">{image.name}</span>
+                    <span className="text-sm text-blue-600 font-medium">
+                      {image?.name}
+                    </span>      
                     <span className="text-xs text-gray-500 mt-1">Click to change image</span>
                   </div>
                 ) : (
@@ -252,8 +255,8 @@ const Verify = () => {
                 {/* Trust Score */}
                 <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-200">
                   <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Trust Score</p>
-                  <p className={`text-3xl font-bold ${getScoreColor(result.trustScore || result.trust_score || 0)}`}>
-                    {result.trustScore || result.trust_score || 0}%
+                  <p className={`text-3xl font-bold ${getScoreColor(result.trust_score || 0)}`}>
+                    {result.trust_score || 0}%
                   </p>
                 </div>
 

@@ -6,7 +6,7 @@ import axios from 'axios';
  * The Node backend then calls Python FastAPI at http://localhost:8000 for AI services.
  */
 const api = axios.create({
-  baseURL: '', // Use relative URLs — Vite proxy handles routing
+  baseURL: 'http://127.0.0.1:5001', // Use relative URLs — Vite proxy handles routing
   headers: {
     'Content-Type': 'application/json',
   },
