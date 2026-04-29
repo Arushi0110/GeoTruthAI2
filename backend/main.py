@@ -18,6 +18,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 from backend.services.news_api_service import verify_with_newsapi
 from dotenv import load_dotenv
+from fastapi import Query
 
 load_dotenv()
 
@@ -231,26 +232,39 @@ async def login(request: LoginRequest):
 # ---------------------------------------------------------------------------
 # Root & Health
 # ---------------------------------------------------------------------------
-@app.get("/", tags=["Root"])
-async def root():
-    """Root endpoint."""
+
+
+# ---------------- NEWS HISTORY ----------------
+@app.get("/api/news/history")
+async def get_news_history(limit: int = Query(200, ge=1, le=500)):
+    """
+    Temporary news history endpoint (replace with DB later)
+    """
     return {
-        "message": "GeoTruth AI API is running",
-        "version": "1.0.0",
-        "docs": "/docs",
-        "health": "/health",
+        "data": [
+            {
+                "id": "1",
+                "text": "Government announces new AI policy for digital media",
+                "label": "REAL",
+                "trustScore": 85,
+                "createdAt": "2026-04-30T10:00:00"
+            },
+            {
+                "id": "2",
+                "text": "Viral claim about election results goes viral on WhatsApp",
+                "label": "FAKE",
+                "trustScore": 25,
+                "createdAt": "2026-04-29T18:30:00"
+            },
+            {
+                "id": "3",
+                "text": "Mixed reports about economic growth trends",
+                "label": "MISLEADING",
+                "trustScore": 55,
+                "createdAt": "2026-04-28T14:15:00"
+            }
+        ][:limit]
     }
-
-
-@app.get("/health", response_model=HealthResponse, tags=["Health"])
-async def health():
-    """Health check endpoint."""
-    return HealthResponse(
-        status="healthy",
-        model_loaded=is_model_loaded(),
-        image_model_loaded=is_cnn_loaded(),
-        news_api_available=is_api_key_configured(),
-    )
 
 
 # ---------------------------------------------------------------------------

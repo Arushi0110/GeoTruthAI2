@@ -1,120 +1,45 @@
-import { useState } from 'react';
-import { newsAPI } from './services/api';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import { isAuthenticated } from './utils/auth';
+
+import Navbar from './components/Navbar';
+import Chatbot from './components/Chatbot';
+import ProtectedRoute from './components/ProtectedRoute';
+
+const Login = lazy(() => import('./pages/Login'));
+const Signup = lazy(() => import('./pages/Signup'));
+const Landing = lazy(() => import('./pages/Landing'));
+const Verify = lazy(() => import('./pages/Verify'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+
+function PageLoader() {
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex flex-col items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4" />
+        <p className="text-gray-600 text-sm font-medium">Loading...</p>
+      </div>
+    </div>
+  );
+}
 
 function App() {
-  const [text, setText] = useState('');
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const handleAnalyze = async () => {
-    if (!text.trim()) {
-      alert("Enter some news text");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setResult(null); // reset previous result
-
-      const res = await newsAPI.analyze({ text }); // ✅ JSON request
-
-      setResult(res.data);
-    } catch (err) {
-      console.error(err);
-      alert(err.message || "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  const authenticated = isAuthenticated();
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background: '#f5f7fa',
-        padding: '40px',
-        fontFamily: 'Arial',
-      }}
-    >
-      <div
-        style={{
-          maxWidth: '800px',
-          margin: 'auto',
-          background: '#fff',
-          padding: '30px',
-          borderRadius: '12px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-        }}
-      >
-        <h1 style={{ textAlign: 'center' }}>🧠 GeoTruth AI</h1>
-        <p style={{ textAlign: 'center', color: '#555' }}>
-          Detect fake / real news instantly
-        </p>
-
-        <textarea
-          rows="5"
-          style={{
-            width: '100%',
-            padding: '12px',
-            borderRadius: '8px',
-            border: '1px solid #ccc',
-            marginTop: '20px',
-          }}
-          placeholder="Paste news text here..."
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
-
-        <button
-          onClick={handleAnalyze}
-          disabled={loading}
-          style={{
-            width: '100%',
-            marginTop: '20px',
-            padding: '12px',
-            borderRadius: '8px',
-            border: 'none',
-            background: loading ? '#6c757d' : '#007bff',
-            color: '#fff',
-            fontSize: '16px',
-            cursor: loading ? 'not-allowed' : 'pointer',
-          }}
-        >
-          {loading ? "Analyzing..." : "Analyze News"}
-        </button>
-
-        {/* RESULT */}
-        {result && (
-          <div
-            style={{
-              marginTop: '30px',
-              padding: '20px',
-              borderRadius: '10px',
-              background:
-                result.label === "REAL"
-                  ? '#e6f4ea'
-                  : result.label === "FAKE"
-                  ? '#fdecea'
-                  : '#fff4e5',
-            }}
-          >
-            <h2>Result</h2>
-
-            <p><strong>Label:</strong> {result.label}</p>
-            <p><strong>Trust Score:</strong> {result.trust_score}%</p>
-            <p>
-              <strong>Confidence:</strong>{" "}
-              {(result.confidence * 100).toFixed(2)}%
-            </p>
-
-            <div style={{ marginTop: '10px', fontWeight: 'bold' }}>
-              {result.label === "REAL" && "✅ Reliable News"}
-              {result.label === "FAKE" && "❌ Fake News"}
-              {result.label === "MISLEADING" && "⚠️ Misleading Content"}
-            </div>
-          </div>
-        )}
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      {authenticated && <Navbar />}
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/login" element={authenticated ? <Navigate to="/home" replace /> : <Login />} />
+          <Route path="/signup" element={authenticated ? <Navigate to="/home" replace /> : <Signup />} />
+          <Route path="/home" element={<ProtectedRoute><Landing /></ProtectedRoute>} />
+          <Route path="/verify" element={<ProtectedRoute><Verify /></ProtectedRoute>} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/" element={<Navigate to={authenticated ? '/home' : '/login'} replace />} />
+          <Route path="*" element={<Navigate to={authenticated ? '/home' : '/login'} replace />} />
+        </Routes>
+      </Suspense>
+      {authenticated && <Chatbot />}
     </div>
   );
 }
