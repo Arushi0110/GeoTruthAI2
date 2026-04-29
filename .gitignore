@@ -1,2 +1,40 @@
-whatsapp-service/.env.example
+# env files
 .env
+.env.local
+.env.production
+
+# dependencies
+node_modules/
+
+# logs
+logs
+*.log
+
+# OS files
+.DS_Store
+
+# ignore env example
+whatsapp-service/.env.example# env files
+.env
+.env.local
+.env.production
+whatsapp-service/.env.example
+
+# dependencies
+node_modules/
+
+# python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# build outputs
+dist/
+build/
+
+# logs
+logs
+*.log
+
+# OS files
+.DS_Store

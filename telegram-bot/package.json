@@ -1,0 +1,24 @@
+{
+  "name": "geotruth-telegram-bot",
+  "version": "1.0.0",
+  "description": "Telegram bot for GeoTruth AI news verification",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js",
+    "webhook": "node webhook.js",
+    "dev": "nodemon bot.js",
+    "dev:webhook": "nodemon webhook.js"
+  },
+  "keywords": ["telegram", "bot", "news", "ai", "verification"],
+  "author": "GeoTruth AI",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.7.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "telegraf": "^4.16.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}

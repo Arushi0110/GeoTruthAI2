@@ -1,0 +1,33 @@
+{
+  "name": "geotruth-whatsapp-service",
+  "version": "1.0.0",
+  "description": "WhatsApp webhook for GeoTruth AI verification via Twilio",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "keywords": [
+    "whatsapp",
+    "twilio",
+    "webhook",
+    "news",
+    "ai"
+  ],
+  "author": "GeoTruth AI",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.7.2",
+    "cors": "^2.8.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "form-data": "^4.0.5",
+    "multer": "^1.4.5-lts.1",
+    "twilio": "^5.3.4",
+    "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}

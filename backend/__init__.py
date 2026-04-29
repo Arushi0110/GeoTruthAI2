@@ -1,0 +1,3 @@
+"""
+GeoTruth AI backend package.
+"""
