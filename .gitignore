@@ -23,4 +23,6 @@ dist/
 build/
 
 # env example files
-whatsapp-service/.env.example
+whatsapp-service/.env.example.env
+.env.example
+whatsapp-service/.env
