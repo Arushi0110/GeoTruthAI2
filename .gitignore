@@ -26,3 +26,5 @@ build/
 whatsapp-service/.env.example.env
 .env.example
 whatsapp-service/.env
+.env
+.env.*
