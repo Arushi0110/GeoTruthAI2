@@ -1,4 +1,5 @@
 import logger from '../utils/logger.js';
+import OpenAI from "openai";
 
 /**
  * Chat Controller — Backend API for chatbot responses
@@ -30,7 +31,25 @@ class ChatController {
 
       logger.info(`Chat message from user ${userId}: "${message}"`);
 
-      const response = generateDynamicResponse(message, context || '');
+      const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+const aiResponse = await client.chat.completions.create({
+  model: "gpt-4o-mini",
+  messages: [
+    {
+      role: "system",
+      content: "You are GeoTruth AI assistant. Help users detect fake news and explain trust score.",
+    },
+    {
+      role: "user",
+      content: message,
+    },
+  ],
+});
+
+const response = aiResponse.choices[0].message.content;
 
       res.status(200).json({
         success: true,
